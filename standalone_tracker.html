@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>My Daily Routine</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{background:#0e0e0e;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;}
+  .wrap{max-width:700px;margin:0 auto;padding:1.25rem;}
+  .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+  .title{font-size:21px;font-weight:600;color:#f0f0f0;}
+  .sub{font-size:12px;color:#666;margin-top:3px;}
+  .tabs{display:flex;gap:5px;}
+  .tab{background:#1e1e1e;border:0.5px solid #333;border-radius:8px;padding:6px 11px;color:#888;font-size:12px;cursor:pointer;font-weight:400;transition:all .15s;}
+  .tab.active{background:#7c6ef5;border-color:#7c6ef5;color:#fff;font-weight:500;}
+  .day-tabs{display:flex;gap:4px;margin-bottom:.75rem;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+  .day-tabs::-webkit-scrollbar{display:none;}
+  .day-tab{background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:8px;padding:6px 10px;color:#666;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+  .day-tab.active{background:#7c6ef5;border-color:#7c6ef5;color:#fff;font-weight:500;}
+  .day-tab.today{border-color:#7c6ef5;color:#a89cf7;}
+  .badge{font-size:11px;color:#a89cf7;background:#2a2560;border-radius:6px;padding:3px 10px;display:inline-block;margin-bottom:.75rem;}
+  .progress-wrap{background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:10px;padding:12px 16px;margin-bottom:.75rem;}
+  .progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .progress-label{font-size:13px;color:#aaa;}
+  .progress-val{font-size:13px;font-weight:500;color:#7c6ef5;}
+  .bar{height:4px;background:#252525;border-radius:2px;}
+  .fill{height:100%;border-radius:2px;transition:width .4s;}
+  .legend{display:flex;flex-wrap:wrap;gap:5px 12px;margin-bottom:.75rem;}
+  .legend-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#666;}
+  .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .task-card{background:#161616;border:0.5px solid #2a2a2a;border-radius:10px;padding:9px 13px;margin-bottom:6px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s;}
+  .task-card.done{background:#1a1a2e;border-color:#3a3560;}
+  .task-card.transition-card{background:#1a1208;border-color:#3a2a10;}
+  .task-card.review-card{background:#1a1228;border-color:#2e2060;}
+  .time-badge{font-size:10px;border-radius:5px;padding:2px 7px;white-space:nowrap;min-width:65px;text-align:center;}
+  .task-label{flex:1;font-size:13.5px;color:#e0e0e0;transition:all .15s;}
+  .task-label.done{color:#666;text-decoration:line-through;}
+  .checkbox{width:17px;height:17px;border-radius:5px;border:0.5px solid #444;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+  .checkbox.checked{background:#7c6ef5;border:none;}
+  .checkmark{color:#fff;font-size:10px;}
+  .card{background:#161616;border:0.5px solid #2a2a2a;border-radius:12px;padding:16px;margin-bottom:12px;}
+  .card-title{font-size:13px;font-weight:500;color:#aaa;margin-bottom:14px;}
+  .history-row{display:flex;align-items:center;gap:12px;cursor:pointer;padding:10px 12px;background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:10px;margin-bottom:8px;transition:background .15s;}
+  .history-row.today-row{background:#1a1a2e;border-color:#3a3560;}
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .stat-box{background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:10px;padding:12px 10px;text-align:center;}
+  .stat-label{font-size:11px;color:#666;margin-bottom:6px;}
+  .stat-val{font-size:20px;font-weight:500;color:#7c6ef5;}
+  .day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .day-box{background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:8px;padding:10px 4px;text-align:center;cursor:pointer;}
+  .day-box.today-box{border-color:#7c6ef5;}
+  .back-btn{background:#1e1e1e;border:0.5px solid #333;border-radius:8px;padding:6px 12px;color:#aaa;font-size:12px;cursor:pointer;}
+  .bar-chart{display:flex;align-items:flex-end;gap:8px;height:160px;justify-content:space-between;}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
+  .bar-inner{width:100%;display:flex;align-items:flex-end;justify-content:center;height:130px;}
+  .bar-rect{width:100%;border-radius:5px 5px 2px 2px;transition:height .3s;}
+  .chart-footer{border-top:0.5px solid #222;margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  .legend-dot{width:8px;height:8px;border-radius:2px;}
+  @media(max-width:480px){.wrap{padding:1rem .85rem;}.title{font-size:18px;}.stat-val{font-size:17px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-row">
+    <div>
+      <div class="title">My Daily Routine</div>
+      <div class="sub" id="date-sub"></div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="setView('today')">Today</button>
+      <button class="tab" onclick="setView('week')">Week</button>
+      <button class="tab" onclick="setView('history')">History</button>
+    </div>
+  </div>
+  <div id="main"></div>
+</div>
+
+<script>
+const STORAGE_KEY = "routine_standalone_v1";
+
+const SCHEDULE = {
+  MONDAY:[
+    {id:"mo1",time:"6:00",label:"Wake up"},
+    {id:"mo2",time:"6:00–7:00",label:"Exercise + Fresh up"},
+    {id:"mo3",time:"7:00–7:40",label:"Breakfast + Ready"},
+    {id:"mo4",time:"8:30–9:20",label:"Class — BEEE"},
+    {id:"mo5",time:"9:20–10:10",label:"Class — C++"},
+    {id:"mo6",time:"10:10–11:00",label:"Typing (+2 WPM) + Notes revise"},
+    {id:"mo7",time:"11:05–11:55",label:"Class — Probability"},
+    {id:"mo8",time:"12:00–12:50",label:"Class — EDP"},
+    {id:"mo9",time:"1:00–2:30",label:"Lunch + Rest"},
+    {id:"mo10",time:"2:30–3:00",label:"Same-day revision — BEEE + Probability"},
+    {id:"mo11",time:"3:30–5:10",label:"Class — Aptitude Skills"},
+    {id:"mo12",time:"5:10–5:30",label:"🔁 Transition ritual"},
+    {id:"mo13",time:"5:30–6:30",label:"Naasta + Walk"},
+    {id:"mo14",time:"6:30–7:30",label:"🔴 C++ Deep Work (phone away)"},
+    {id:"mo15",time:"7:30–8:00",label:"Instagram (hard lock 30 min)"},
+    {id:"mo16",time:"8:00–9:00",label:"Dinner"},
+    {id:"mo17",time:"9:00–10:00",label:"College study — BEEE / Probability"},
+    {id:"mo18",time:"10:00–10:15",label:"Typing sprint"},
+    {id:"mo19",time:"10:15–10:25",label:"📋 Night review"},
+    {id:"mo20",time:"10:25–11:30",label:"Call + Light reading / Code practice"},
+    {id:"mo21",time:"11:30",label:"Sleep 🌙"},
+  ],
+  TUESDAY:[
+    {id:"tu1",time:"6:00",label:"Wake up"},
+    {id:"tu2",time:"6:00–7:00",label:"Exercise"},
+    {id:"tu3",time:"7:00–7:30",label:"Breakfast"},
+    {id:"tu4",time:"8:30–9:20",label:"Class — C++"},
+    {id:"tu5",time:"9:20–10:10",label:"Typing + Revision (save energy)"},
+    {id:"tu6",time:"10:15–11:55",label:"Class — CBM"},
+    {id:"tu7",time:"12:00–12:50",label:"Class — Probability"},
+    {id:"tu8",time:"1:00–1:30",label:"Lunch"},
+    {id:"tu9",time:"1:45–3:25",label:"Class — BEEE"},
+    {id:"tu10",time:"3:30–5:10",label:"Class — EDP Lab"},
+    {id:"tu11",time:"5:10–5:30",label:"🔁 Transition ritual"},
+    {id:"tu12",time:"5:30–6:30",label:"Naasta + Walk"},
+    {id:"tu13",time:"6:30–8:00",label:"🔴 C++ Deep Work"},
+    {id:"tu14",time:"8:00–8:30",label:"Dinner"},
+    {id:"tu15",time:"8:30–9:00",label:"Instagram (hard lock 30 min)"},
+    {id:"tu16",time:"9:00–10:00",label:"Light revision — no new topics"},
+    {id:"tu17",time:"10:00–10:10",label:"Typing sprint"},
+    {id:"tu18",time:"10:10–10:20",label:"📋 Night review"},
+    {id:"tu19",time:"10:20–11:30",label:"Rest + Call"},
+    {id:"tu20",time:"11:30",label:"Sleep 🌙"},
+  ],
+  WEDNESDAY:[
+    {id:"we1",time:"6:00",label:"Wake up"},
+    {id:"we2",time:"6:00–7:00",label:"Exercise"},
+    {id:"we3",time:"7:00–9:00",label:"🔴 C++ Deep Work (best slot of the week)"},
+    {id:"we4",time:"9:00–9:45",label:"Typing (push for personal best)"},
+    {id:"we5",time:"9:45–10:30",label:"Communication — mirror speaking / English aloud"},
+    {id:"we6",time:"11:05–11:55",label:"Class — Discrete Maths"},
+    {id:"we7",time:"12:00–12:50",label:"Class — CBM"},
+    {id:"we8",time:"1:00–2:00",label:"Lunch + Rest"},
+    {id:"we9",time:"2:00–3:30",label:"Communication — structured practice"},
+    {id:"we10",time:"3:30–5:00",label:"Personality work — watch 1 video, apply 1 thing"},
+    {id:"we11",time:"5:00–6:00",label:"Naasta + Walk"},
+    {id:"we12",time:"6:00–6:30",label:"Instagram (hard lock 30 min)"},
+    {id:"we13",time:"6:30–7:30",label:"Communication / Speaking round 2"},
+    {id:"we14",time:"7:30–8:30",label:"Dinner"},
+    {id:"we15",time:"9:00–10:30",label:"Coding + Revision"},
+    {id:"we16",time:"10:30–10:40",label:"📋 Night review"},
+    {id:"we17",time:"10:40–11:30",label:"Call + Wind down"},
+    {id:"we18",time:"11:30",label:"Sleep 🌙"},
+  ],
+  THURSDAY:[
+    {id:"th1",time:"6:00",label:"Wake up"},
+    {id:"th2",time:"6:00–7:00",label:"Exercise"},
+    {id:"th3",time:"7:00–8:30",label:"Communication building — structured"},
+    {id:"th4",time:"8:30–9:00",label:"Typing + Light study"},
+    {id:"th5",time:"11:05–11:55",label:"Class — C++"},
+    {id:"th6",time:"12:00–12:50",label:"Class — BEEE"},
+    {id:"th7",time:"12:50–1:40",label:"Class — Discrete Maths"},
+    {id:"th8",time:"2:00–3:00",label:"Lunch + Rest"},
+    {id:"th9",time:"3:30–5:10",label:"Class — EDP"},
+    {id:"th10",time:"5:10–5:30",label:"🔁 Transition ritual"},
+    {id:"th11",time:"5:30–6:30",label:"Naasta + Walk"},
+    {id:"th12",time:"6:30–7:30",label:"🔴 C++ Focused"},
+    {id:"th13",time:"7:30–8:00",label:"Instagram (hard lock 30 min)"},
+    {id:"th14",time:"8:00–9:00",label:"Dinner"},
+    {id:"th15",time:"9:00–10:30",label:"College study"},
+    {id:"th16",time:"10:30–10:40",label:"Typing sprint"},
+    {id:"th17",time:"10:40–10:50",label:"📋 Night review"},
+    {id:"th18",time:"10:50–11:30",label:"Call + Rest"},
+    {id:"th19",time:"11:30",label:"Sleep 🌙"},
+  ],
+  FRIDAY:[
+    {id:"fr1",time:"6:30",label:"Wake up"},
+    {id:"fr2",time:"7:00–9:00",label:"🔴 C++ Deep Work"},
+    {id:"fr3",time:"9:00–9:30",label:"Typing (track WPM today)"},
+    {id:"fr4",time:"10:00–12:00",label:"Core subjects — BEEE / Maths"},
+    {id:"fr5",time:"12:00–12:30",label:"🔁 Transition ritual + Walk"},
+    {id:"fr6",time:"1:30",label:"Lunch"},
+    {id:"fr7",time:"3:00–5:00",label:"Backlog clear + Revision"},
+    {id:"fr8",time:"5:00–5:15",label:"🔁 Transition ritual"},
+    {id:"fr9",time:"5:30–6:30",label:"Walk + Naasta"},
+    {id:"fr10",time:"6:30–7:30",label:"Communication — best effort of the week"},
+    {id:"fr11",time:"7:30–8:00",label:"Instagram (hard lock 30 min)"},
+    {id:"fr12",time:"8:00–9:00",label:"Dinner"},
+    {id:"fr13",time:"9:00–10:30",label:"Light study + Coding videos"},
+    {id:"fr14",time:"10:30–10:40",label:"📋 Night review + Weekend plan"},
+    {id:"fr15",time:"11:00",label:"Sleep 🌙"},
+  ],
+  SATURDAY:[
+    {id:"sa1",time:"6:30",label:"Wake up"},
+    {id:"sa2",time:"7:00–9:00",label:"🔴 C++ Deep Work"},
+    {id:"sa3",time:"9:00–9:30",label:"Typing"},
+    {id:"sa4",time:"10:00–12:00",label:"College subjects"},
+    {id:"sa5",time:"1:00",label:"Lunch"},
+    {id:"sa6",time:"3:00–5:00",label:"Weekly revision — all subjects"},
+    {id:"sa7",time:"5:00–5:15",label:"🔁 Transition ritual"},
+    {id:"sa8",time:"5:30–6:30",label:"Walk"},
+    {id:"sa9",time:"6:30–7:30",label:"Light coding / Problem solving"},
+    {id:"sa10",time:"7:30–8:00",label:"Instagram (hard lock 30 min)"},
+    {id:"sa11",time:"8:00–9:00",label:"Dinner"},
+    {id:"sa12",time:"9:00–10:00",label:"📋 Weekly review"},
+    {id:"sa13",time:"10:00–11:00",label:"Plan full next week"},
+    {id:"sa14",time:"11:00",label:"Sleep 🌙"},
+  ],
+  SUNDAY:[
+    {id:"su1",time:"6:30",label:"Wake up"},
+    {id:"su2",time:"6:30–7:30",label:"Exercise + Fresh up"},
+    {id:"su3",time:"7:30–8:15",label:"Breakfast + Ready"},
+    {id:"su4",time:"8:30–10:10",label:"Class — C++"},
+    {id:"su5",time:"10:15–11:05",label:"Class — BEEE"},
+    {id:"su6",time:"11:05–11:55",label:"Class — Probability"},
+    {id:"su7",time:"12:00–12:50",label:"Class — Discrete Maths"},
+    {id:"su8",time:"12:50–1:45",label:"Lunch + Rest"},
+    {id:"su9",time:"1:45–3:25",label:"Class — Aptitude Skills"},
+    {id:"su10",time:"3:25–3:45",label:"🔁 Transition ritual"},
+    {id:"su11",time:"3:45–5:00",label:"Same-day revision — C++ + Probability"},
+    {id:"su12",time:"5:00–6:00",label:"Naasta + Walk"},
+    {id:"su13",time:"6:00–7:30",label:"🔴 C++ Deep Work (phone away)"},
+    {id:"su14",time:"7:30–8:00",label:"Instagram (hard lock 30 min)"},
+    {id:"su15",time:"8:00–9:00",label:"Dinner"},
+    {id:"su16",time:"9:00–10:00",label:"College study — BEEE / Discrete Maths"},
+    {id:"su17",time:"10:00–10:10",label:"Typing sprint"},
+    {id:"su18",time:"10:10–10:20",label:"📋 Night review"},
+    {id:"su19",time:"10:20–11:00",label:"Call + Wind down"},
+    {id:"su20",time:"11:00",label:"Sleep 🌙"},
+  ],
+};
+
+const DAY_BADGE={MONDAY:"Heavy 💪",TUESDAY:"Very Heavy ⚠️",WEDNESDAY:"Golden 🚀",THURSDAY:"Balanced ⚖️",FRIDAY:"Advantage 💥",SATURDAY:"Reset 🔄",SUNDAY:"Heavy Class Day 📚"};
+const DAYS=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
+const SHORT={SUNDAY:"Sun",MONDAY:"Mon",TUESDAY:"Tue",WEDNESDAY:"Wed",THURSDAY:"Thu",FRIDAY:"Fri",SATURDAY:"Sat"};
+const CAT_COLOR={code:"#7c6ef5",college:"#4da6ff",health:"#4ecb71",food:"#f5a623",growth:"#e85d8a",typing:"#00c9a7",leisure:"#f0c040",transition:"#ff8c42",review:"#b388ff",routine:"#888"};
+const CAT_LABEL={code:"C++/Code 🔴",college:"College",health:"Health",food:"Food/Rest",growth:"Growth",typing:"Typing",leisure:"Instagram",transition:"Transition 🔁",review:"Review 📋",routine:"Routine"};
+
+function cat(label){
+  const l=label.toLowerCase();
+  if(l.includes("🔴")||l.includes("c++")||l.includes("coding")||l.includes("code")) return "code";
+  if(l.includes("class")||l.includes("beee")||l.includes("probability")||l.includes("edp")||l.includes("cbm")||l.includes("discrete")||l.includes("aptitude")||l.includes("revision")||l.includes("revise")||l.includes("backlog")||l.includes("college")||l.includes("study")||l.includes("subjects")) return "college";
+  if(l.includes("exercise")||l.includes("fresh")||l.includes("walk")) return "health";
+  if(l.includes("breakfast")||l.includes("lunch")||l.includes("dinner")||l.includes("naasta")||l.includes("rest")||l.includes("wind down")) return "food";
+  if(l.includes("communication")||l.includes("personality")||l.includes("speaking")||l.includes("mirror")||l.includes("english")||l.includes("storytelling")) return "growth";
+  if(l.includes("typing")) return "typing";
+  if(l.includes("instagram")||l.includes("insta")) return "leisure";
+  if(l.includes("🔁")||l.includes("transition")) return "transition";
+  if(l.includes("📋")||l.includes("night review")||l.includes("weekly review")||l.includes("plan full")) return "review";
+  return "routine";
+}
+
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const getDayName=()=>DAYS[new Date().getDay()];
+const getDayFromDate=d=>DAYS[new Date(d+"T12:00:00").getDay()];
+const shortDate=d=>new Date(d+"T12:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+const getLast7=()=>{const a=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);a.push(d.toISOString().slice(0,10));}return a;};
+
+let logs={};
+let currentView="today";
+let activeDay=getDayName();
+let historyDate=null;
+
+function loadLogs(){try{const s=localStorage.getItem(STORAGE_KEY);if(s)logs=JSON.parse(s);}catch{}}
+function saveLogs(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(logs));}catch{}}
+function isChecked(id,date){return!!logs[date+"_"+id];}
+function toggle(id){const k=todayStr()+"_"+id;logs[k]=!logs[k];saveLogs();render();}
+
+function getCompletion(date){
+  const dn=getDayFromDate(date);
+  const ts=SCHEDULE[dn]||[];
+  if(!ts.length)return{done:0,total:0,pct:0};
+  const done=ts.filter(t=>isChecked(t.id,date)).length;
+  return{done,total:ts.length,pct:Math.round((done/ts.length)*100)};
+}
+
+function setView(v){
+  currentView=v;
+  if(v==="history")historyDate=null;
+  document.querySelectorAll(".tab").forEach((b,i)=>{
+    b.classList.toggle("active",["today","week","history"][i]===v);
+  });
+  render();
+}
+
+function renderTasks(tasks,date,clickable){
+  return tasks.map(t=>{
+    const c=cat(t.label);
+    const checked=isChecked(t.id,date);
+    const cc=CAT_COLOR[c]||"#888";
+    const cardClass=`task-card${checked?" done":""}${c==="transition"?" transition-card":""}${c==="review"?" review-card":""}`;
+    const click=clickable?`onclick="toggle('${t.id}')"`:"";
+    return `<div class="${cardClass}" ${click}>
+      <div class="dot" style="background:${cc}"></div>
+      <span class="time-badge" style="color:${cc};background:${cc}18">${t.time}</span>
+      <span class="task-label${checked?" done":""}">${t.label}</span>
+      ${clickable?`<div class="checkbox${checked?" checked":""}">${checked?'<span class="checkmark">✓</span>':""}</div>`
+      :checked?`<span style="color:#7c6ef5;font-size:14px">✓</span>`:""}
+    </div>`;
+  }).join("");
+}
+
+function renderToday(){
+  const tasks=SCHEDULE[activeDay]||[];
+  const done=tasks.filter(t=>isChecked(t.id,todayStr())).length;
+  const pct=tasks.length?Math.round((done/tasks.length)*100):0;
+  const isToday=activeDay===getDayName();
+  const dayTabs=DAYS.map(d=>{
+    const isT=d===getDayName();
+    let cls="day-tab";
+    if(d===activeDay)cls+=" active";
+    else if(isT)cls+=" today";
+    return `<button class="${cls}" onclick="setActiveDay('${d}')">${SHORT[d]}</button>`;
+  }).join("");
+  const legendHtml=Object.entries(CAT_LABEL).map(([c,l])=>`<div class="legend-item"><div class="dot" style="background:${CAT_COLOR[c]}"></div>${l}</div>`).join("");
+  return `
+    <div class="day-tabs">${dayTabs}</div>
+    <div class="badge">${activeDay} — ${DAY_BADGE[activeDay]}</div>
+    <div class="progress-wrap">
+      <div class="progress-top">
+        <span class="progress-label">${isToday?"Today's progress":SHORT[activeDay]+" schedule"}</span>
+        <span class="progress-val">${isToday?`${done}/${tasks.length} · ${pct}%`:tasks.length+" tasks"}</span>
+      </div>
+      <div class="bar"><div class="fill" style="width:${isToday?pct:0}%;background:linear-gradient(90deg,#7c6ef5,#a89cf7)"></div></div>
+    </div>
+    <div class="legend">${legendHtml}</div>
+    ${renderTasks(tasks,todayStr(),isToday)}
+  `;
+}
+
+function renderWeek(){
+  const td=getDayName();
+  const bars=DAYS.map(d=>{
+    const ts=SCHEDULE[d]||[];
+    const dW=ts.filter(t=>isChecked(t.id,todayStr())).length;
+    const pW=ts.length?Math.round((dW/ts.length)*100):0;
+    const h=Math.max(4,Math.round((pW/100)*130));
+    const isT=d===td,isA=d===activeDay;
+    const bg=isT?"#7c6ef5":isA?"#9f8fff":pW>0?"#3d3470":"#222";
+    const border=isT?"none":isA?"0.5px solid #7c6ef5":"0.5px solid #2a2a2a";
+    return `<div class="bar-col" onclick="setActiveDay('${d}');setView('today')">
+      <span style="font-size:10px;color:${pW>0?"#a89cf7":"#555"};min-height:14px">${pW>0?pW+"%":""}</span>
+      <div class="bar-inner"><div class="bar-rect" style="height:${h}px;background:${bg};border:${border}"></div></div>
+      <span style="font-size:11px;color:${isT?"#a89cf7":isA?"#888":"#555"};font-weight:${isT?500:400}">${SHORT[d]}</span>
+    </div>`;
+  }).join("");
+
+  const activeDays=DAYS.filter(d=>(SCHEDULE[d]||[]).some(t=>isChecked(t.id,todayStr()))).length;
+  const dayBoxes=DAYS.map(d=>{
+    const ts=SCHEDULE[d]||[];
+    const dW=ts.filter(t=>isChecked(t.id,todayStr())).length;
+    const pW=ts.length?Math.round((dW/ts.length)*100):0;
+    const isT=d===td;
+    return `<div class="day-box${isT?" today-box":""}" onclick="setActiveDay('${d}');setView('today')">
+      <div style="font-size:10px;color:${isT?"#a89cf7":"#666"};margin-bottom:4px">${SHORT[d]}</div>
+      <div style="font-size:17px;font-weight:500;color:${pW>0?"#7c6ef5":"#444"}">${pW}%</div>
+      <div style="font-size:9px;color:#555;margin-top:2px">${ts.length}t</div>
+    </div>`;
+  }).join("");
+
+  const catBars=Object.entries(CAT_LABEL).map(([c,l])=>{
+    const todayTasks=(SCHEDULE[td]||[]).filter(t=>cat(t.label)===c);
+    if(!todayTasks.length)return"";
+    const dC=todayTasks.filter(t=>isChecked(t.id,todayStr())).length;
+    const pC=Math.round((dC/todayTasks.length)*100);
+    return `<div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <div style="display:flex;align-items:center;gap:6px"><div class="dot" style="background:${CAT_COLOR[c]}"></div><span style="font-size:12px;color:#aaa">${l}</span></div>
+        <span style="font-size:12px;color:#666">${dC}/${todayTasks.length}</span>
+      </div>
+      <div class="bar"><div class="fill" style="width:${pC}%;background:${CAT_COLOR[c]}"></div></div>
+    </div>`;
+  }).join("");
+
+  return `
+    <p style="font-size:13px;color:#666;margin-bottom:1rem">Weekly completion — tap a bar to open that day</p>
+    <div class="card">
+      <div class="bar-chart">${bars}</div>
+      <div class="chart-footer">
+        <span style="font-size:11px;color:#555">${activeDays}/7 days active</span>
+        <div style="display:flex;gap:10px">
+          ${[["#7c6ef5","Today"],["#3d3470","Done"],["#222","Pending"]].map(([bg,lbl])=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#555"><div class="legend-dot" style="background:${bg};border:${bg==="#222"?"0.5px solid #333":"none"}"></div>${lbl}</div>`).join("")}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Day load overview</div>
+      <div class="day-grid">${dayBoxes}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Category breakdown — ${SHORT[td]}</div>
+      ${catBars}
+    </div>
+  `;
+}
+
+function renderHistory(){
+  if(historyDate){
+    const dn=getDayFromDate(historyDate);
+    const tasks=SCHEDULE[dn]||[];
+    const done=tasks.filter(t=>isChecked(t.id,historyDate)).length;
+    const pct=tasks.length?Math.round((done/tasks.length)*100):0;
+    const isToday=historyDate===todayStr();
+    return `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+        <button class="back-btn" onclick="historyDate=null;render()">← Back</button>
+        <div>
+          <span style="font-size:15px;font-weight:500;color:#f0f0f0">${dn} — ${shortDate(historyDate)}</span>
+          ${isToday?`<span style="font-size:11px;color:#a89cf7;margin-left:8px">Today</span>`:""}
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-top">
+          <span class="progress-label">${DAY_BADGE[dn]}</span>
+          <span class="progress-val">${done?`${done}/${tasks.length} · ${pct}%`:"No data"}</span>
+        </div>
+        <div class="bar"><div class="fill" style="width:${pct}%;background:linear-gradient(90deg,#7c6ef5,#a89cf7)"></div></div>
+      </div>
+      ${!done?`<div style="text-align:center;color:#555;font-size:13px;padding:1rem 0">No tasks completed this day</div>`:""}
+      ${renderTasks(tasks,historyDate,false)}
+    `;
+  }
+
+  const last7=getLast7();
+  const rows=last7.map(date=>{
+    const {done,total,pct}=getCompletion(date);
+    const dn=getDayFromDate(date);
+    const isToday=date===todayStr();
+    return `<div class="history-row${isToday?" today-row":""}" onclick="historyDate='${date}';render()">
+      <div style="min-width:70px">
+        <div style="font-size:12px;font-weight:500;color:${isToday?"#a89cf7":"#ccc"}">${SHORT[dn]}${isToday?" · Today":""}</div>
+        <div style="font-size:11px;color:#555;margin-top:2px">${shortDate(date)}</div>
+      </div>
+      <div style="flex:1"><div class="bar"><div class="fill" style="width:${pct}%;background:${done?"#7c6ef5":"#333"}"></div></div></div>
+      <div style="min-width:60px;text-align:right">
+        <span style="font-size:13px;font-weight:500;color:${done?"#7c6ef5":"#444"}">${done?`${done}/${total}`:"—"}</span>
+        <span style="font-size:11px;color:#555;margin-left:4px">${done?pct+"%":""}</span>
+      </div>
+      <span style="font-size:14px;color:#444">›</span>
+    </div>`;
+  }).join("");
+
+  const total7=last7.reduce((a,d)=>a+getCompletion(d).done,0);
+  const best=last7.reduce((a,b)=>getCompletion(a).pct>=getCompletion(b).pct?a:b);
+  const bestLabel=getCompletion(best).done>0?SHORT[getDayFromDate(best)]:"—";
+  const avg=Math.round(last7.reduce((a,d)=>a+getCompletion(d).pct,0)/7);
+
+  const catRows=Object.entries(CAT_LABEL).map(([c,l])=>{
+    let total=0,done=0;
+    last7.forEach(date=>{
+      const dn=getDayFromDate(date);
+      const ts=(SCHEDULE[dn]||[]).filter(t=>cat(t.label)===c);
+      total+=ts.length;
+      done+=ts.filter(t=>isChecked(t.id,date)).length;
+    });
+    if(!total)return"";
+    const p=Math.round((done/total)*100);
+    return `<div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <div style="display:flex;align-items:center;gap:6px"><div class="dot" style="background:${CAT_COLOR[c]}"></div><span style="font-size:12px;color:#aaa">${l}</span></div>
+        <span style="font-size:12px;color:#666">${done}/${total} · ${p}%</span>
+      </div>
+      <div class="bar"><div class="fill" style="width:${p}%;background:${CAT_COLOR[c]}"></div></div>
+    </div>`;
+  }).join("");
+
+  return `
+    <p style="font-size:13px;color:#666;margin-bottom:1rem">Tap any day to see detailed completion</p>
+    <div class="card">
+      <div class="card-title">Last 7 days</div>
+      ${rows}
+    </div>
+    <div class="card">
+      <div class="card-title">7-day stats</div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-label">Tasks done</div><div class="stat-val">${total7}</div></div>
+        <div class="stat-box"><div class="stat-label">Best day</div><div class="stat-val">${bestLabel}</div></div>
+        <div class="stat-box"><div class="stat-label">Avg</div><div class="stat-val">${avg>0?avg+"%":"—"}</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Category consistency — last 7 days</div>
+      ${catRows}
+    </div>
+  `;
+}
+
+function setActiveDay(d){activeDay=d;render();}
+
+function render(){
+  const main=document.getElementById("main");
+  if(currentView==="today")main.innerHTML=renderToday();
+  else if(currentView==="week")main.innerHTML=renderWeek();
+  else main.innerHTML=renderHistory();
+}
+
+// init
+loadLogs();
+document.getElementById("date-sub").textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"});
+render();
+</script>
+</body>
+</html>
