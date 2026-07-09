@@ -82,6 +82,50 @@
 <script>
 const STORAGE_KEY = "routine_standalone_v1";
 
+const SUMMER_END = "2026-07-21";
+const isSummerMode = () => new Date().toISOString().slice(0,10) <= SUMMER_END;
+
+const getGitTopic = () => {
+  const start = new Date("2026-07-09");
+  const today = new Date();
+  const day = Math.floor((today - start) / 86400000) + 1;
+  if(day <= 3) return "Git basics + GitHub 🐙";
+  if(day <= 6) return "Linux commands 🐧";
+  if(day <= 9) return "GitHub advanced — branches, PRs 🔀";
+  return "Mix revision + small project 🛠️";
+};
+
+const getDaysLeft = () => {
+  const end = new Date("2026-07-22");
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  return Math.max(0, Math.ceil((end - today) / 86400000));
+};
+
+const SUMMER_SCHEDULE = {
+  tasks: [
+    {id:"su_1", time:"6:00", label:"Wake up"},
+    {id:"su_2", time:"6:00–7:00", label:"Exercise + Meditation 🧘"},
+    {id:"su_3", time:"7:00–7:30", label:"Brush + Freshen up"},
+    {id:"su_4", time:"7:30–8:00", label:"Bath 🚿"},
+    {id:"su_5", time:"8:00–9:00", label:"Breakfast + Coding videos"},
+    {id:"su_6", time:"9:00–11:00", label:"🔴 C++ Deep Work (2 hours)"},
+    {id:"su_7", time:"11:00–12:00", label:"Typing — track WPM today ⌨️"},
+    {id:"su_8", time:"12:00–1:00", label:"Lunch + Rest"},
+    {id:"su_9", time:"1:00–3:00", label:"Git / GitHub / Linux + Dev tools 💻"},
+    {id:"su_10", time:"3:00–4:00", label:"Communication skill development 🗣️"},
+    {id:"su_11", time:"4:00–5:00", label:"Walk + Naasta"},
+    {id:"su_12", time:"5:00–6:00", label:"Free / Personality / Videos"},
+    {id:"su_13", time:"6:00–7:00", label:"Instagram (hard lock 1 hour) 📱"},
+    {id:"su_14", time:"7:00–8:00", label:"College study — exam prep 📖"},
+    {id:"su_15", time:"8:00–9:00", label:"Dinner"},
+    {id:"su_16", time:"9:00–10:00", label:"Night revision — same day topics"},
+    {id:"su_17", time:"10:00–10:10", label:"📋 Night review"},
+    {id:"su_18", time:"10:10–11:00", label:"Call + Wind down"},
+    {id:"su_19", time:"11:00", label:"Sleep 🌙"},
+  ]
+};
+
 const SCHEDULE = {
   MONDAY:[
     {id:"mo1",time:"6:00",label:"Wake up"},
@@ -257,6 +301,13 @@ let currentView="today";
 let activeDay=getDayName();
 let historyDate=null;
 
+function getSummerTasks(){
+  return SUMMER_SCHEDULE.tasks.map(t=>{
+    if(t.id==="su_9") return {...t, label:`${getGitTopic()}`};
+    return t;
+  });
+}
+
 function loadLogs(){try{const s=localStorage.getItem(STORAGE_KEY);if(s)logs=JSON.parse(s);}catch{}}
 function saveLogs(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(logs));}catch{}}
 function isChecked(id,date){return!!logs[date+"_"+id];}
@@ -297,30 +348,53 @@ function renderTasks(tasks,date,clickable){
 }
 
 function renderToday(){
-  const tasks=SCHEDULE[activeDay]||[];
-  const done=tasks.filter(t=>isChecked(t.id,todayStr())).length;
+  const summer = isSummerMode();
+  const tasks = summer ? getSummerTasks() : (SCHEDULE[activeDay]||[]);
+  const dateKey = todayStr();
+  const done=tasks.filter(t=>isChecked(t.id,dateKey)).length;
   const pct=tasks.length?Math.round((done/tasks.length)*100):0;
   const isToday=activeDay===getDayName();
-  const dayTabs=DAYS.map(d=>{
+  const daysLeft=getDaysLeft();
+
+  const summerBanner = summer ? `
+    <div style="background:linear-gradient(135deg,#1a1a2e,#2a1a4e);border:0.5px solid #7c6ef5;border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#a89cf7">☀️ Summer Break Mode</div>
+        <div style="font-size:11px;color:#666;margin-top:3px">July 9 – 21 · Same schedule every day</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:700;color:#7c6ef5">${daysLeft}</div>
+        <div style="font-size:10px;color:#666">days to exam</div>
+      </div>
+    </div>
+    <div style="background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#aaa">
+      📚 Today's Git/Linux topic: <span style="color:#00c9a7;font-weight:500">${getGitTopic()}</span>
+    </div>
+  ` : "";
+
+  const dayTabs = summer ? "" : DAYS.map(d=>{
     const isT=d===getDayName();
     let cls="day-tab";
     if(d===activeDay)cls+=" active";
     else if(isT)cls+=" today";
     return `<button class="${cls}" onclick="setActiveDay('${d}')">${SHORT[d]}</button>`;
   }).join("");
+
   const legendHtml=Object.entries(CAT_LABEL).map(([c,l])=>`<div class="legend-item"><div class="dot" style="background:${CAT_COLOR[c]}"></div>${l}</div>`).join("");
+
   return `
-    <div class="day-tabs">${dayTabs}</div>
-    <div class="badge">${activeDay} — ${DAY_BADGE[activeDay]}</div>
+    ${summerBanner}
+    ${!summer?`<div class="day-tabs">${dayTabs}</div>`:""}
+    ${!summer?`<div class="badge">${activeDay} — ${DAY_BADGE[activeDay]}</div>`:""}
     <div class="progress-wrap">
       <div class="progress-top">
-        <span class="progress-label">${isToday?"Today's progress":SHORT[activeDay]+" schedule"}</span>
-        <span class="progress-val">${isToday?`${done}/${tasks.length} · ${pct}%`:tasks.length+" tasks"}</span>
+        <span class="progress-label">${summer?"Today's progress":isToday?"Today's progress":SHORT[activeDay]+" schedule"}</span>
+        <span class="progress-val">${done}/${tasks.length} · ${pct}%</span>
       </div>
-      <div class="bar"><div class="fill" style="width:${isToday?pct:0}%;background:linear-gradient(90deg,#7c6ef5,#a89cf7)"></div></div>
+      <div class="bar"><div class="fill" style="width:${pct}%;background:linear-gradient(90deg,#7c6ef5,#a89cf7)"></div></div>
     </div>
     <div class="legend">${legendHtml}</div>
-    ${renderTasks(tasks,todayStr(),isToday)}
+    ${renderTasks(tasks, dateKey, true)}
   `;
 }
 
