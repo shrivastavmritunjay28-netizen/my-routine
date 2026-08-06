@@ -1,573 +1,595 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>My Daily Routine</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sem 3 // Routine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  body{background:#0e0e0e;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;}
-  .wrap{max-width:700px;margin:0 auto;padding:1.25rem;}
-  .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
-  .title{font-size:21px;font-weight:600;color:#f0f0f0;}
-  .sub{font-size:12px;color:#666;margin-top:3px;}
-  .tabs{display:flex;gap:5px;}
-  .tab{background:#1e1e1e;border:0.5px solid #333;border-radius:8px;padding:6px 11px;color:#888;font-size:12px;cursor:pointer;font-weight:400;transition:all .15s;}
-  .tab.active{background:#7c6ef5;border-color:#7c6ef5;color:#fff;font-weight:500;}
-  .day-tabs{display:flex;gap:4px;margin-bottom:.75rem;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
-  .day-tabs::-webkit-scrollbar{display:none;}
-  .day-tab{background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:8px;padding:6px 10px;color:#666;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .15s;}
-  .day-tab.active{background:#7c6ef5;border-color:#7c6ef5;color:#fff;font-weight:500;}
-  .day-tab.today{border-color:#7c6ef5;color:#a89cf7;}
-  .badge{font-size:11px;color:#a89cf7;background:#2a2560;border-radius:6px;padding:3px 10px;display:inline-block;margin-bottom:.75rem;}
-  .progress-wrap{background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:10px;padding:12px 16px;margin-bottom:.75rem;}
-  .progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-  .progress-label{font-size:13px;color:#aaa;}
-  .progress-val{font-size:13px;font-weight:500;color:#7c6ef5;}
-  .bar{height:4px;background:#252525;border-radius:2px;}
-  .fill{height:100%;border-radius:2px;transition:width .4s;}
-  .legend{display:flex;flex-wrap:wrap;gap:5px 12px;margin-bottom:.75rem;}
-  .legend-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#666;}
-  .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-  .task-card{background:#161616;border:0.5px solid #2a2a2a;border-radius:10px;padding:9px 13px;margin-bottom:6px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s;}
-  .task-card.done{background:#1a1a2e;border-color:#3a3560;}
-  .task-card.transition-card{background:#1a1208;border-color:#3a2a10;}
-  .task-card.review-card{background:#1a1228;border-color:#2e2060;}
-  .time-badge{font-size:10px;border-radius:5px;padding:2px 7px;white-space:nowrap;min-width:65px;text-align:center;}
-  .task-label{flex:1;font-size:13.5px;color:#e0e0e0;transition:all .15s;}
-  .task-label.done{color:#666;text-decoration:line-through;}
-  .checkbox{width:17px;height:17px;border-radius:5px;border:0.5px solid #444;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
-  .checkbox.checked{background:#7c6ef5;border:none;}
-  .checkmark{color:#fff;font-size:10px;}
-  .card{background:#161616;border:0.5px solid #2a2a2a;border-radius:12px;padding:16px;margin-bottom:12px;}
-  .card-title{font-size:13px;font-weight:500;color:#aaa;margin-bottom:14px;}
-  .history-row{display:flex;align-items:center;gap:12px;cursor:pointer;padding:10px 12px;background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:10px;margin-bottom:8px;transition:background .15s;}
-  .history-row.today-row{background:#1a1a2e;border-color:#3a3560;}
-  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-  .stat-box{background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:10px;padding:12px 10px;text-align:center;}
-  .stat-label{font-size:11px;color:#666;margin-bottom:6px;}
-  .stat-val{font-size:20px;font-weight:500;color:#7c6ef5;}
-  .day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-  .day-box{background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:8px;padding:10px 4px;text-align:center;cursor:pointer;}
-  .day-box.today-box{border-color:#7c6ef5;}
-  .back-btn{background:#1e1e1e;border:0.5px solid #333;border-radius:8px;padding:6px 12px;color:#aaa;font-size:12px;cursor:pointer;}
-  .bar-chart{display:flex;align-items:flex-end;gap:8px;height:160px;justify-content:space-between;}
-  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
-  .bar-inner{width:100%;display:flex;align-items:flex-end;justify-content:center;height:130px;}
-  .bar-rect{width:100%;border-radius:5px 5px 2px 2px;transition:height .3s;}
-  .chart-footer{border-top:0.5px solid #222;margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
-  .legend-dot{width:8px;height:8px;border-radius:2px;}
-  @media(max-width:480px){.wrap{padding:1rem .85rem;}.title{font-size:18px;}.stat-val{font-size:17px;}}
+  :root{
+    --bg:#0D1117;
+    --surface:#141A22;
+    --surface-2:#1B2330;
+    --line:#26303F;
+    --text:#E6EDF3;
+    --muted:#8B96A5;
+    --class:#4F8FF2;      /* scheduled classes */
+    --gate:#F2B84B;       /* GATE prep */
+    --dsa:#4FD1C5;        /* DSA practice */
+    --java:#C792EA;       /* Java vs C++ study */
+    --revision:#6FCF97;   /* revision / homework */
+    --rest:#FF6B5B;       /* buffer / rest */
+    --font-display:'Space Grotesk', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --font-body:'Inter', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 8% 0%, rgba(79,143,242,0.08), transparent 40%),
+      radial-gradient(circle at 92% 100%, rgba(79,209,197,0.06), transparent 45%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  header{
+    padding:36px 20px 24px;
+    max-width:900px;
+    margin:0 auto;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:0.12em;
+    color:var(--muted);
+    text-transform:uppercase;
+  }
+  h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(28px,5vw,42px);
+    margin-top:6px;
+    letter-spacing:-0.02em;
+  }
+  h1 span{color:var(--gate);}
+  .sub{
+    color:var(--muted);
+    font-size:14px;
+    margin-top:8px;
+    max-width:520px;
+    line-height:1.5;
+  }
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-top:20px;
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--muted);
+  }
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+  main{max-width:900px; margin:0 auto; padding:0 20px;}
+
+  .week-overview{
+    margin-top:26px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:20px;
+  }
+  .week-overview-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .week-overview-top h3{
+    font-family:var(--font-display);
+    font-size:15px;
+    font-weight:600;
+  }
+  .week-overview-top .avg{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--dsa);
+  }
+  .week-row{
+    display:grid;
+    grid-template-columns:52px 1fr 40px;
+    align-items:center;
+    gap:12px;
+    padding:7px 0;
+  }
+  .week-row .wday{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--muted);
+  }
+  .week-row.is-today .wday{color:var(--text); font-weight:600;}
+  .week-track{
+    height:6px;
+    background:var(--surface-2);
+    border-radius:3px;
+    overflow:hidden;
+    cursor:pointer;
+  }
+  .week-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--dsa), var(--gate));
+    width:0%;
+    transition:width .3s ease;
+  }
+  .week-row .wpct{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--muted);
+    text-align:right;
+  }
+
+  .daytabs{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding:24px 0 4px;
+    scrollbar-width:none;
+  }
+  .daytabs::-webkit-scrollbar{display:none;}
+  .daytab{
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--muted);
+    background:var(--surface);
+    border:1px solid var(--line);
+    padding:10px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all .15s ease;
+    position:relative;
+  }
+  .daytab:hover{color:var(--text); border-color:#3A4658;}
+  .daytab.active{
+    color:var(--bg);
+    background:var(--text);
+    border-color:var(--text);
+    font-weight:600;
+  }
+  .daytab .load{
+    display:block;
+    font-size:9px;
+    margin-top:2px;
+    opacity:0.65;
+  }
+  .today-badge{
+    position:absolute;
+    top:-6px;
+    right:-6px;
+    width:8px;height:8px;
+    border-radius:50%;
+    background:var(--dsa);
+    box-shadow:0 0 0 2px var(--bg);
+  }
+
+  .daypanel{display:none; padding:20px 0 10px;}
+  .daypanel.active{display:block;}
+
+  .daymeta{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .daymeta h2{
+    font-family:var(--font-display);
+    font-size:20px;
+    font-weight:600;
+  }
+  .daymeta .tag{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--muted);
+    border:1px solid var(--line);
+    padding:4px 10px;
+    border-radius:20px;
+  }
+
+  .progress-track{
+    height:4px;
+    background:var(--surface-2);
+    border-radius:2px;
+    overflow:hidden;
+    margin-bottom:22px;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--dsa), var(--gate));
+    width:0%;
+    transition:width .3s ease;
+  }
+
+  .block{
+    display:flex;
+    gap:14px;
+    padding:14px 0;
+    border-bottom:1px solid var(--line);
+    align-items:flex-start;
+  }
+  .block:last-child{border-bottom:none;}
+
+  .check{
+    width:20px;height:20px;
+    border-radius:5px;
+    border:1.5px solid var(--line);
+    flex-shrink:0;
+    margin-top:2px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:all .15s ease;
+    background:var(--surface);
+  }
+  .check svg{width:12px;height:12px; opacity:0; transition:opacity .1s;}
+  .check.checked svg{opacity:1;}
+  .check.checked{background:var(--revision); border-color:var(--revision);}
+
+  .block-main{flex:1; min-width:0;}
+  .block-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .block-time{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--muted);
+    flex-shrink:0;
+  }
+  .block-title{
+    font-size:15px;
+    font-weight:500;
+  }
+  .block-title.done{opacity:0.45; text-decoration:line-through;}
+  .block-note{
+    font-size:12.5px;
+    color:var(--muted);
+    margin-top:3px;
+  }
+  .pill{
+    display:inline-block;
+    width:6px;height:6px;
+    border-radius:50%;
+    margin-right:7px;
+    vertical-align:middle;
+  }
+
+  footer{
+    max-width:900px;
+    margin:40px auto 0;
+    padding:20px;
+    border-top:1px solid var(--line);
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer button{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--muted);
+    font-family:var(--font-mono);
+    font-size:11px;
+    padding:6px 12px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  footer button:hover{color:var(--text); border-color:#3A4658;}
+
+  @media (max-width:520px){
+    .block-time{width:100%;}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="top-row">
-    <div>
-      <div class="title">My Daily Routine</div>
-      <div class="sub" id="date-sub"></div>
-    </div>
-    <div class="tabs">
-      <button class="tab active" onclick="setView('today')">Today</button>
-      <button class="tab" onclick="setView('week')">Week</button>
-      <button class="tab" onclick="setView('history')">History</button>
-    </div>
+
+<header>
+  <div class="eyebrow">Galgotias University — B.Tech CSE — Section 15</div>
+  <h1>Semester <span>03</span> Routine</h1>
+  <p class="sub">DBMS · COA · Data Structures · Java Programming · Multivariable Calculus · Advanced Aptitude · Design Thinking — built around GATE prep and Java-vs-C++ study.</p>
+  <div class="legend">
+    <div class="legend-item"><span class="dot" style="background:var(--class)"></span>Class</div>
+    <div class="legend-item"><span class="dot" style="background:var(--gate)"></span>GATE prep</div>
+    <div class="legend-item"><span class="dot" style="background:var(--dsa)"></span>DSA</div>
+    <div class="legend-item"><span class="dot" style="background:var(--java)"></span>Java vs C++</div>
+    <div class="legend-item"><span class="dot" style="background:var(--revision)"></span>Revision / HW</div>
+    <div class="legend-item"><span class="dot" style="background:var(--rest)"></span>Buffer / Rest</div>
   </div>
-  <div id="main"></div>
-</div>
+</header>
+
+<main>
+  <div class="daytabs" id="daytabs"></div>
+  <div id="daypanels"></div>
+
+  <div class="week-overview">
+    <div class="week-overview-top">
+      <h3>This week — all days</h3>
+      <span class="avg" id="weekAvg">—</span>
+    </div>
+    <div id="weekRows"></div>
+  </div>
+
+  <footer>
+    <span id="streakinfo">—</span>
+    <button id="resetBtn">Reset today's progress</button>
+  </footer>
+</main>
 
 <script>
-const STORAGE_KEY = "routine_standalone_v1";
-
-const SUMMER_END = "2026-07-21";
-const isSummerMode = () => new Date().toISOString().slice(0,10) <= SUMMER_END;
-
-const getGitTopic = () => {
-  const start = new Date("2026-07-09");
-  const today = new Date();
-  const day = Math.floor((today - start) / 86400000) + 1;
-  if(day <= 3) return "Git basics + GitHub 🐙";
-  if(day <= 6) return "Linux commands 🐧";
-  if(day <= 9) return "GitHub advanced — branches, PRs 🔀";
-  return "Mix revision + small project 🛠️";
+const DATA = {
+  Mon: { load:"Heavy", blocks:[
+    ["06:00 AM","06:30 AM","Wake up + freshen up","revision"],
+    ["06:30 AM","07:30 AM","DSA / GATE problem set (warm-up)","dsa"],
+    ["07:30 AM","08:15 AM","Breakfast + get ready","revision"],
+    ["08:30 AM","10:10 AM","Programming Skills w/ Computational Maths (PR)","class"],
+    ["10:15 AM","11:55 AM","Advanced Aptitude Skills (PR)","class"],
+    ["11:55 AM","12:50 PM","Lunch break","revision"],
+    ["12:50 PM","01:40 PM","Multivariable Calc & Diff. Eq. (PP)","class"],
+    ["01:45 PM","02:35 PM","Computer Organization & Architecture (PP)","class"],
+    ["02:35 PM","03:25 PM","Data Structures (PP)","class"],
+    ["03:30 PM","04:20 PM","Java Programming (PP)","class"],
+    ["04:20 PM","06:00 PM","Java Programming (PR)","class"],
+    ["06:00 PM","06:30 PM","Break / snacks","revision"],
+    ["06:30 PM","08:00 PM","Java vs C++ comparative study","java"],
+    ["08:00 PM","08:45 PM","Dinner","revision"],
+    ["08:45 PM","10:00 PM","Homework / assignments","revision"],
+    ["10:00 PM","10:30 PM","Vocabulary + light reading","revision"],
+  ]},
+  Tue: { load:"Light", blocks:[
+    ["06:00 AM","06:30 AM","Wake up","revision"],
+    ["06:30 AM","09:00 AM","GATE prep (deep block)","gate"],
+    ["09:00 AM","09:30 AM","Breakfast","revision"],
+    ["09:30 AM","12:50 PM","DSA practice","dsa"],
+    ["12:50 PM","01:40 PM","Multivariable Calc & Diff. Eq. (PR)","class"],
+    ["01:45 PM","02:35 PM","Multivariable Calc & Diff. Eq. (PR)","class"],
+    ["02:35 PM","03:25 PM","DBMS (PP)","class"],
+    ["03:30 PM","04:20 PM","Java Programming (PP)","class"],
+    ["04:20 PM","06:00 PM","Advanced Aptitude Skills (PR)","class"],
+    ["06:00 PM","07:00 PM","Java vs C++ study","java"],
+    ["07:00 PM","08:00 PM","Dinner + break","revision"],
+    ["08:00 PM","09:30 PM","Homework / revision","revision"],
+    ["09:30 PM","10:00 PM","Vocabulary + wind down","revision"],
+  ]},
+  Wed: { load:"Light", blocks:[
+    ["06:00 AM","06:30 AM","Wake up","revision"],
+    ["06:30 AM","09:00 AM","GATE prep","gate"],
+    ["09:00 AM","09:30 AM","Breakfast","revision"],
+    ["09:30 AM","12:50 PM","DSA practice","dsa"],
+    ["12:50 PM","01:40 PM","Computer Organization & Architecture (PP)","class"],
+    ["01:45 PM","02:35 PM","DBMS (PP)","class"],
+    ["02:35 PM","03:25 PM","Java Programming (PP)","class"],
+    ["03:25 PM","04:00 PM","Break","revision"],
+    ["04:00 PM","05:00 PM","Java vs C++ study","java"],
+    ["05:00 PM","07:00 PM","Free / personal time","revision"],
+    ["07:00 PM","08:00 PM","Dinner + break","revision"],
+    ["08:00 PM","09:30 PM","Homework / revision","revision"],
+    ["09:30 PM","10:00 PM","Vocabulary + wind down","revision"],
+  ]},
+  Thu: { load:"Light", blocks:[
+    ["06:00 AM","06:30 AM","Wake up","revision"],
+    ["06:30 AM","09:00 AM","GATE prep","gate"],
+    ["09:00 AM","09:30 AM","Breakfast","revision"],
+    ["09:30 AM","01:45 PM","DSA practice","dsa"],
+    ["01:45 PM","02:35 PM","Data Structures (PP)","class"],
+    ["02:35 PM","03:25 PM","Multivariable Calc & Diff. Eq. (PP)","class"],
+    ["03:30 PM","04:20 PM","Design Thinking (PP)","class"],
+    ["04:20 PM","06:00 PM","Programming Skills w/ Computational Maths (PR)","class"],
+    ["06:00 PM","07:00 PM","Java vs C++ study","java"],
+    ["07:00 PM","08:00 PM","Dinner + break","revision"],
+    ["08:00 PM","09:30 PM","Homework / revision","revision"],
+    ["09:30 PM","10:00 PM","Vocabulary + wind down","revision"],
+  ]},
+  Fri: { load:"Free — grind", blocks:[
+    ["06:00 AM","06:30 AM","Wake up","revision"],
+    ["06:30 AM","09:00 AM","GATE prep — deep dive","gate"],
+    ["09:00 AM","09:30 AM","Breakfast","revision"],
+    ["09:30 AM","12:30 PM","DSA — topic-wise + contest practice","dsa"],
+    ["12:30 PM","01:30 PM","Lunch + break","revision"],
+    ["01:30 PM","03:30 PM","College subjects revision (rotate)","revision"],
+    ["03:30 PM","04:00 PM","Break","revision"],
+    ["04:00 PM","06:00 PM","Java vs C++ study / project work","java"],
+    ["06:00 PM","07:00 PM","Free / personal time","revision"],
+    ["07:00 PM","08:00 PM","Dinner","revision"],
+    ["08:00 PM","09:30 PM","GATE mock test / PYQs","gate"],
+    ["09:30 PM","10:00 PM","Vocabulary + wind down","revision"],
+  ]},
+  Sat: { load:"Buffer", blocks:[
+    ["07:00 AM","08:00 AM","Wake up (no alarm pressure)","rest"],
+    ["08:00 AM","09:00 AM","Breakfast, relaxed","rest"],
+    ["09:00 AM","11:00 AM","Catch-up block — pending HW / DSA / GATE topic","revision"],
+    ["11:00 AM","01:00 PM","Optional light DSA / revision (no pressure)","rest"],
+    ["01:00 PM","02:00 PM","Lunch","rest"],
+    ["02:00 PM","05:00 PM","Completely free — rest, hobbies, recharge","rest"],
+    ["05:00 PM","06:30 PM","Optional: Java/C++ or light reading","rest"],
+    ["06:30 PM","—","Free evening — dinner, chill, no fixed block","rest"],
+  ]},
+  Sun: { load:"Heavy", blocks:[
+    ["06:00 AM","06:30 AM","Wake up + freshen up","revision"],
+    ["06:30 AM","07:30 AM","DSA / GATE problem set (warm-up)","dsa"],
+    ["07:30 AM","08:15 AM","Breakfast + get ready","revision"],
+    ["08:30 AM","10:10 AM","DBMS (PR)","class"],
+    ["10:15 AM","11:05 AM","Computer Organization & Architecture (PP)","class"],
+    ["11:05 AM","11:55 AM","Data Structures (PP)","class"],
+    ["12:00 PM","12:50 PM","DBMS (PP)","class"],
+    ["12:50 PM","01:45 PM","Lunch break","revision"],
+    ["01:45 PM","03:25 PM","DBMS (PR)","class"],
+    ["03:30 PM","04:20 PM","Multivariable Calc & Diff. Eq. (PP)","class"],
+    ["04:20 PM","06:00 PM","Java vs C++ comparative study","java"],
+    ["06:00 PM","06:30 PM","Break / snacks","revision"],
+    ["06:30 PM","08:00 PM","Homework / assignments","revision"],
+    ["08:00 PM","08:45 PM","Dinner","revision"],
+    ["08:45 PM","10:00 PM","Revision / light GATE reading","gate"],
+    ["10:00 PM","10:30 PM","Vocabulary + wind down","revision"],
+  ]},
 };
 
-const getDaysLeft = () => {
-  const end = new Date("2026-07-22");
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  return Math.max(0, Math.ceil((end - today) / 86400000));
-};
+const DAY_ORDER = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const todayName = DAY_ORDER[(new Date().getDay()+6)%7]; // JS Sunday=0 -> map so Mon=0
 
-const SUMMER_SCHEDULE = {
-  tasks: [
-    {id:"su_1", time:"6:00", label:"Wake up"},
-    {id:"su_2", time:"6:00–7:00", label:"Exercise + Meditation 🧘"},
-    {id:"su_3", time:"7:00–7:30", label:"Brush + Freshen up"},
-    {id:"su_4", time:"7:30–8:00", label:"Bath 🚿"},
-    {id:"su_5", time:"8:00–9:00", label:"Breakfast + Coding videos"},
-    {id:"su_6", time:"9:00–11:00", label:"🔴 C++ Deep Work (2 hours)"},
-    {id:"su_7", time:"11:00–12:00", label:"Typing — track WPM today ⌨️"},
-    {id:"su_8", time:"12:00–1:00", label:"Lunch + Rest"},
-    {id:"su_9", time:"1:00–3:00", label:"Git / GitHub / Linux + Dev tools 💻"},
-    {id:"su_10", time:"3:00–4:00", label:"Communication skill development 🗣️"},
-    {id:"su_11", time:"4:00–5:00", label:"Walk + Naasta"},
-    {id:"su_12", time:"5:00–6:00", label:"Free / Personality / Videos"},
-    {id:"su_13", time:"6:00–7:00", label:"Instagram (hard lock 1 hour) 📱"},
-    {id:"su_14", time:"7:00–8:00", label:"College study — exam prep 📖"},
-    {id:"su_15", time:"8:00–9:00", label:"Dinner"},
-    {id:"su_16", time:"9:00–10:00", label:"Night revision — same day topics"},
-    {id:"su_17", time:"10:00–10:10", label:"📋 Night review"},
-    {id:"su_18", time:"10:10–11:00", label:"Call + Wind down"},
-    {id:"su_19", time:"11:00", label:"Sleep 🌙"},
-  ]
-};
+const tabsEl = document.getElementById('daytabs');
+const panelsEl = document.getElementById('daypanels');
 
-const SCHEDULE = {
-  MONDAY:[
-    {id:"mo1",time:"6:00",label:"Wake up"},
-    {id:"mo2",time:"6:00–7:00",label:"Exercise + Fresh up"},
-    {id:"mo3",time:"7:00–7:40",label:"Breakfast + Ready"},
-    {id:"mo4",time:"8:30–9:20",label:"Class — BEEE"},
-    {id:"mo5",time:"9:20–10:10",label:"Class — C++"},
-    {id:"mo6",time:"10:10–11:00",label:"Typing (+2 WPM) + Notes revise"},
-    {id:"mo7",time:"11:05–11:55",label:"Class — Probability"},
-    {id:"mo8",time:"12:00–12:50",label:"Class — EDP"},
-    {id:"mo9",time:"1:00–2:30",label:"Lunch + Rest"},
-    {id:"mo10",time:"2:30–3:00",label:"Same-day revision — BEEE + Probability"},
-    {id:"mo11",time:"3:30–5:10",label:"Class — Aptitude Skills"},
-    {id:"mo12",time:"5:10–5:30",label:"🔁 Transition ritual"},
-    {id:"mo13",time:"5:30–6:30",label:"Naasta + Walk"},
-    {id:"mo14",time:"6:30–7:30",label:"🔴 C++ Deep Work (phone away)"},
-    {id:"mo15",time:"7:30–8:00",label:"Instagram (hard lock 30 min)"},
-    {id:"mo16",time:"8:00–9:00",label:"Dinner"},
-    {id:"mo17",time:"9:00–10:00",label:"College study — BEEE / Probability"},
-    {id:"mo18",time:"10:00–10:15",label:"Typing sprint"},
-    {id:"mo19",time:"10:15–10:25",label:"📋 Night review"},
-    {id:"mo20",time:"10:25–11:30",label:"Call + Light reading / Code practice"},
-    {id:"mo21",time:"11:30",label:"Sleep 🌙"},
-  ],
-  TUESDAY:[
-    {id:"tu1",time:"6:00",label:"Wake up"},
-    {id:"tu2",time:"6:00–7:00",label:"Exercise"},
-    {id:"tu3",time:"7:00–7:30",label:"Breakfast"},
-    {id:"tu4",time:"8:30–9:20",label:"Class — C++"},
-    {id:"tu5",time:"9:20–10:10",label:"Typing + Revision (save energy)"},
-    {id:"tu6",time:"10:15–11:55",label:"Class — CBM"},
-    {id:"tu7",time:"12:00–12:50",label:"Class — Probability"},
-    {id:"tu8",time:"1:00–1:30",label:"Lunch"},
-    {id:"tu9",time:"1:45–3:25",label:"Class — BEEE"},
-    {id:"tu10",time:"3:30–5:10",label:"Class — EDP Lab"},
-    {id:"tu11",time:"5:10–5:30",label:"🔁 Transition ritual"},
-    {id:"tu12",time:"5:30–6:30",label:"Naasta + Walk"},
-    {id:"tu13",time:"6:30–8:00",label:"🔴 C++ Deep Work"},
-    {id:"tu14",time:"8:00–8:30",label:"Dinner"},
-    {id:"tu15",time:"8:30–9:00",label:"Instagram (hard lock 30 min)"},
-    {id:"tu16",time:"9:00–10:00",label:"Light revision — no new topics"},
-    {id:"tu17",time:"10:00–10:10",label:"Typing sprint"},
-    {id:"tu18",time:"10:10–10:20",label:"📋 Night review"},
-    {id:"tu19",time:"10:20–11:30",label:"Rest + Call"},
-    {id:"tu20",time:"11:30",label:"Sleep 🌙"},
-  ],
-  WEDNESDAY:[
-    {id:"we1",time:"6:00",label:"Wake up"},
-    {id:"we2",time:"6:00–7:00",label:"Exercise"},
-    {id:"we3",time:"7:00–9:00",label:"🔴 C++ Deep Work (best slot of the week)"},
-    {id:"we4",time:"9:00–9:45",label:"Typing (push for personal best)"},
-    {id:"we5",time:"9:45–10:30",label:"College study — library 📚"},
-    {id:"we6",time:"11:05–11:55",label:"Class — Discrete Maths"},
-    {id:"we7",time:"12:00–12:50",label:"Class — CBM"},
-    {id:"we8",time:"1:00–2:00",label:"Lunch + Rest"},
-    {id:"we9",time:"2:00–3:30",label:"Communication — mirror speaking / structured practice"},
-    {id:"we10",time:"3:30–5:00",label:"Personality work — watch 1 video, apply 1 thing"},
-    {id:"we11",time:"5:00–6:00",label:"Naasta + Walk"},
-    {id:"we12",time:"6:00–6:30",label:"Instagram (hard lock 30 min)"},
-    {id:"we13",time:"6:30–7:30",label:"Communication / Speaking round 2"},
-    {id:"we14",time:"7:30–8:30",label:"Dinner"},
-    {id:"we15",time:"9:00–10:30",label:"Coding + Revision"},
-    {id:"we16",time:"10:30–10:40",label:"📋 Night review"},
-    {id:"we17",time:"10:40–11:30",label:"Call + Wind down"},
-    {id:"we18",time:"11:30",label:"Sleep 🌙"},
-  ],
-  THURSDAY:[
-    {id:"th1",time:"6:00",label:"Wake up"},
-    {id:"th2",time:"6:00–7:00",label:"Exercise"},
-    {id:"th3",time:"7:00–7:45",label:"Breakfast + Ready for college"},
-    {id:"th4",time:"7:45–7:55",label:"Leave for college 🚌"},
-    {id:"th5",time:"11:05–11:55",label:"Class — C++"},
-    {id:"th6",time:"12:00–12:50",label:"Class — BEEE"},
-    {id:"th7",time:"12:50–1:40",label:"Class — Discrete Maths"},
-    {id:"th8",time:"2:00–3:00",label:"Lunch + Rest"},
-    {id:"th9",time:"3:30–5:10",label:"Class — EDP"},
-    {id:"th10",time:"5:10–5:30",label:"🔁 Transition ritual"},
-    {id:"th11",time:"5:30–6:30",label:"Naasta + Walk"},
-    {id:"th12",time:"6:30–7:30",label:"🔴 C++ Focused"},
-    {id:"th13",time:"7:30–8:00",label:"Instagram (hard lock 30 min)"},
-    {id:"th14",time:"8:00–9:00",label:"Dinner"},
-    {id:"th15",time:"9:00–10:30",label:"College study"},
-    {id:"th16",time:"10:30–10:40",label:"Typing sprint"},
-    {id:"th17",time:"10:40–10:50",label:"📋 Night review"},
-    {id:"th18",time:"10:50–11:30",label:"Call + Rest"},
-    {id:"th19",time:"11:30",label:"Sleep 🌙"},
-  ],
-  FRIDAY:[
-    {id:"fr1",time:"6:30",label:"Wake up"},
-    {id:"fr2",time:"7:00–9:00",label:"🔴 C++ Deep Work"},
-    {id:"fr3",time:"9:00–9:30",label:"Typing (track WPM today)"},
-    {id:"fr4",time:"10:00–12:00",label:"Core subjects — BEEE / Maths"},
-    {id:"fr5",time:"12:00–12:30",label:"🔁 Transition ritual + Walk"},
-    {id:"fr6",time:"1:30",label:"Lunch"},
-    {id:"fr7",time:"3:00–5:00",label:"Backlog clear + Revision"},
-    {id:"fr8",time:"5:00–5:15",label:"🔁 Transition ritual"},
-    {id:"fr9",time:"5:30–6:30",label:"Walk + Naasta"},
-    {id:"fr10",time:"6:30–7:30",label:"Communication — best effort of the week"},
-    {id:"fr11",time:"7:30–8:00",label:"Instagram (hard lock 30 min)"},
-    {id:"fr12",time:"8:00–9:00",label:"Dinner"},
-    {id:"fr13",time:"9:00–10:30",label:"Light study + Coding videos"},
-    {id:"fr14",time:"10:30–10:40",label:"📋 Night review + Weekend plan"},
-    {id:"fr15",time:"11:00",label:"Sleep 🌙"},
-  ],
-  SATURDAY:[
-    {id:"sa1",time:"6:30",label:"Wake up"},
-    {id:"sa2",time:"7:00–9:00",label:"🔴 C++ Deep Work"},
-    {id:"sa3",time:"9:00–9:30",label:"Typing"},
-    {id:"sa4",time:"10:00–12:00",label:"College subjects"},
-    {id:"sa5",time:"1:00",label:"Lunch"},
-    {id:"sa6",time:"3:00–5:00",label:"Weekly revision — all subjects"},
-    {id:"sa7",time:"5:00–5:15",label:"🔁 Transition ritual"},
-    {id:"sa8",time:"5:30–6:30",label:"Walk"},
-    {id:"sa9",time:"6:30–7:30",label:"Light coding / Problem solving"},
-    {id:"sa10",time:"7:30–8:00",label:"Instagram (hard lock 30 min)"},
-    {id:"sa11",time:"8:00–9:00",label:"Dinner"},
-    {id:"sa12",time:"9:00–10:00",label:"📋 Weekly review"},
-    {id:"sa13",time:"10:00–11:00",label:"Plan full next week"},
-    {id:"sa14",time:"11:00",label:"Sleep 🌙"},
-  ],
-  SUNDAY:[
-    {id:"su1",time:"6:30",label:"Wake up"},
-    {id:"su2",time:"6:30–7:30",label:"Exercise + Fresh up"},
-    {id:"su3",time:"7:30–8:15",label:"Breakfast + Ready"},
-    {id:"su4",time:"8:30–10:10",label:"Class — C++"},
-    {id:"su5",time:"10:15–11:05",label:"Class — BEEE"},
-    {id:"su6",time:"11:05–11:55",label:"Class — Probability"},
-    {id:"su7",time:"12:00–12:50",label:"Class — Discrete Maths"},
-    {id:"su8",time:"12:50–1:45",label:"Lunch + Rest"},
-    {id:"su9",time:"1:45–3:25",label:"Class — Aptitude Skills"},
-    {id:"su10",time:"3:25–3:45",label:"🔁 Transition ritual"},
-    {id:"su11",time:"3:45–5:00",label:"Same-day revision — C++ + Probability"},
-    {id:"su12",time:"5:00–6:00",label:"Naasta + Walk"},
-    {id:"su13",time:"6:00–7:30",label:"🔴 C++ Deep Work (phone away)"},
-    {id:"su14",time:"7:30–8:00",label:"Instagram (hard lock 30 min)"},
-    {id:"su15",time:"8:00–9:00",label:"Dinner"},
-    {id:"su16",time:"9:00–10:00",label:"College study — BEEE / Discrete Maths"},
-    {id:"su17",time:"10:00–10:10",label:"Typing sprint"},
-    {id:"su18",time:"10:10–10:20",label:"📋 Night review"},
-    {id:"su19",time:"10:20–11:00",label:"Call + Wind down"},
-    {id:"su20",time:"11:00",label:"Sleep 🌙"},
-  ],
-};
-
-const DAY_BADGE={MONDAY:"Heavy 💪",TUESDAY:"Very Heavy ⚠️",WEDNESDAY:"Golden 🚀",THURSDAY:"Balanced ⚖️",FRIDAY:"Advantage 💥",SATURDAY:"Reset 🔄",SUNDAY:"Heavy Class Day 📚"};
-const DAYS=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
-const SHORT={SUNDAY:"Sun",MONDAY:"Mon",TUESDAY:"Tue",WEDNESDAY:"Wed",THURSDAY:"Thu",FRIDAY:"Fri",SATURDAY:"Sat"};
-const CAT_COLOR={code:"#7c6ef5",college:"#4da6ff",health:"#4ecb71",food:"#f5a623",growth:"#e85d8a",typing:"#00c9a7",leisure:"#f0c040",transition:"#ff8c42",review:"#b388ff",routine:"#888"};
-const CAT_LABEL={code:"C++/Code 🔴",college:"College",health:"Health",food:"Food/Rest",growth:"Growth",typing:"Typing",leisure:"Instagram",transition:"Transition 🔁",review:"Review 📋",routine:"Routine"};
-
-function cat(label){
-  const l=label.toLowerCase();
-  if(l.includes("🔴")||l.includes("c++")||l.includes("coding")||l.includes("code")) return "code";
-  if(l.includes("class")||l.includes("beee")||l.includes("probability")||l.includes("edp")||l.includes("cbm")||l.includes("discrete")||l.includes("aptitude")||l.includes("revision")||l.includes("revise")||l.includes("backlog")||l.includes("college")||l.includes("study")||l.includes("subjects")) return "college";
-  if(l.includes("exercise")||l.includes("fresh")||l.includes("walk")) return "health";
-  if(l.includes("breakfast")||l.includes("lunch")||l.includes("dinner")||l.includes("naasta")||l.includes("rest")||l.includes("wind down")) return "food";
-  if(l.includes("communication")||l.includes("personality")||l.includes("speaking")||l.includes("mirror")||l.includes("english")||l.includes("storytelling")) return "growth";
-  if(l.includes("typing")) return "typing";
-  if(l.includes("instagram")||l.includes("insta")) return "leisure";
-  if(l.includes("🔁")||l.includes("transition")) return "transition";
-  if(l.includes("📋")||l.includes("night review")||l.includes("weekly review")||l.includes("plan full")) return "review";
-  return "routine";
+function storageKey(day, idx){
+  const d = new Date();
+  const weekStamp = getWeekStamp(d);
+  return `sem3_${weekStamp}_${day}_${idx}`;
+}
+function getWeekStamp(d){
+  const onejan = new Date(d.getFullYear(),0,1);
+  const week = Math.ceil((((d - onejan) / 86400000) + onejan.getDay()+1)/7);
+  return `${d.getFullYear()}-w${week}`;
 }
 
-const todayStr=()=>new Date().toISOString().slice(0,10);
-const getDayName=()=>DAYS[new Date().getDay()];
-const getDayFromDate=d=>DAYS[new Date(d+"T12:00:00").getDay()];
-const shortDate=d=>new Date(d+"T12:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"short"});
-const getLast7=()=>{const a=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);a.push(d.toISOString().slice(0,10));}return a;};
+DAY_ORDER.forEach(day=>{
+  const tab = document.createElement('div');
+  tab.className = 'daytab' + (day===todayName ? ' active':'');
+  tab.dataset.day = day;
+  tab.innerHTML = `${day}<span class="load">${DATA[day].load}</span>` + (day===todayName ? '<span class="today-badge"></span>':'');
+  tab.onclick = ()=> switchDay(day);
+  tabsEl.appendChild(tab);
 
-let logs={};
-let currentView="today";
-let activeDay=getDayName();
-let historyDate=null;
+  const panel = document.createElement('div');
+  panel.className = 'daypanel' + (day===todayName ? ' active':'');
+  panel.dataset.day = day;
 
-function getSummerTasks(){
-  return SUMMER_SCHEDULE.tasks.map(t=>{
-    if(t.id==="su_9") return {...t, label:`${getGitTopic()}`};
-    return t;
-  });
-}
-
-function loadLogs(){try{const s=localStorage.getItem(STORAGE_KEY);if(s)logs=JSON.parse(s);}catch{}}
-function saveLogs(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(logs));}catch{}}
-function isChecked(id,date){return!!logs[date+"_"+id];}
-function toggle(id){const k=todayStr()+"_"+id;logs[k]=!logs[k];saveLogs();render();}
-
-function getCompletion(date){
-  const dn=getDayFromDate(date);
-  const ts=SCHEDULE[dn]||[];
-  if(!ts.length)return{done:0,total:0,pct:0};
-  const done=ts.filter(t=>isChecked(t.id,date)).length;
-  return{done,total:ts.length,pct:Math.round((done/ts.length)*100)};
-}
-
-function setView(v){
-  currentView=v;
-  if(v==="history")historyDate=null;
-  document.querySelectorAll(".tab").forEach((b,i)=>{
-    b.classList.toggle("active",["today","week","history"][i]===v);
-  });
-  render();
-}
-
-function renderTasks(tasks,date,clickable){
-  return tasks.map(t=>{
-    const c=cat(t.label);
-    const checked=isChecked(t.id,date);
-    const cc=CAT_COLOR[c]||"#888";
-    const cardClass=`task-card${checked?" done":""}${c==="transition"?" transition-card":""}${c==="review"?" review-card":""}`;
-    const click=clickable?`onclick="toggle('${t.id}')"`:"";
-    return `<div class="${cardClass}" ${click}>
-      <div class="dot" style="background:${cc}"></div>
-      <span class="time-badge" style="color:${cc};background:${cc}18">${t.time}</span>
-      <span class="task-label${checked?" done":""}">${t.label}</span>
-      ${clickable?`<div class="checkbox${checked?" checked":""}">${checked?'<span class="checkmark">✓</span>':""}</div>`
-      :checked?`<span style="color:#7c6ef5;font-size:14px">✓</span>`:""}
-    </div>`;
-  }).join("");
-}
-
-function renderToday(){
-  const summer = isSummerMode();
-  const tasks = summer ? getSummerTasks() : (SCHEDULE[activeDay]||[]);
-  const dateKey = todayStr();
-  const done=tasks.filter(t=>isChecked(t.id,dateKey)).length;
-  const pct=tasks.length?Math.round((done/tasks.length)*100):0;
-  const isToday=activeDay===getDayName();
-  const daysLeft=getDaysLeft();
-
-  const summerBanner = summer ? `
-    <div style="background:linear-gradient(135deg,#1a1a2e,#2a1a4e);border:0.5px solid #7c6ef5;border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-size:13px;font-weight:600;color:#a89cf7">☀️ Summer Break Mode</div>
-        <div style="font-size:11px;color:#666;margin-top:3px">July 9 – 21 · Same schedule every day</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:22px;font-weight:700;color:#7c6ef5">${daysLeft}</div>
-        <div style="font-size:10px;color:#666">days to exam</div>
-      </div>
+  const totalMins = DATA[day].blocks.length;
+  panel.innerHTML = `
+    <div class="daymeta">
+      <h2>${fullDayName(day)}</h2>
+      <span class="tag">${DATA[day].load} day</span>
     </div>
-    <div style="background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#aaa">
-      📚 Today's Git/Linux topic: <span style="color:#00c9a7;font-weight:500">${getGitTopic()}</span>
-    </div>
-  ` : "";
-
-  const dayTabs = summer ? "" : DAYS.map(d=>{
-    const isT=d===getDayName();
-    let cls="day-tab";
-    if(d===activeDay)cls+=" active";
-    else if(isT)cls+=" today";
-    return `<button class="${cls}" onclick="setActiveDay('${d}')">${SHORT[d]}</button>`;
-  }).join("");
-
-  const legendHtml=Object.entries(CAT_LABEL).map(([c,l])=>`<div class="legend-item"><div class="dot" style="background:${CAT_COLOR[c]}"></div>${l}</div>`).join("");
-
-  return `
-    ${summerBanner}
-    ${!summer?`<div class="day-tabs">${dayTabs}</div>`:""}
-    ${!summer?`<div class="badge">${activeDay} — ${DAY_BADGE[activeDay]}</div>`:""}
-    <div class="progress-wrap">
-      <div class="progress-top">
-        <span class="progress-label">${summer?"Today's progress":isToday?"Today's progress":SHORT[activeDay]+" schedule"}</span>
-        <span class="progress-val">${done}/${tasks.length} · ${pct}%</span>
-      </div>
-      <div class="bar"><div class="fill" style="width:${pct}%;background:linear-gradient(90deg,#7c6ef5,#a89cf7)"></div></div>
-    </div>
-    <div class="legend">${legendHtml}</div>
-    ${renderTasks(tasks, dateKey, true)}
+    <div class="progress-track"><div class="progress-fill" id="fill-${day}"></div></div>
+    <div class="blocklist" id="blocks-${day}"></div>
   `;
-}
+  panelsEl.appendChild(panel);
 
-function renderWeek(){
-  const td=getDayName();
-  const bars=DAYS.map(d=>{
-    const ts=SCHEDULE[d]||[];
-    const dW=ts.filter(t=>isChecked(t.id,todayStr())).length;
-    const pW=ts.length?Math.round((dW/ts.length)*100):0;
-    const h=Math.max(4,Math.round((pW/100)*130));
-    const isT=d===td,isA=d===activeDay;
-    const bg=isT?"#7c6ef5":isA?"#9f8fff":pW>0?"#3d3470":"#222";
-    const border=isT?"none":isA?"0.5px solid #7c6ef5":"0.5px solid #2a2a2a";
-    return `<div class="bar-col" onclick="setActiveDay('${d}');setView('today')">
-      <span style="font-size:10px;color:${pW>0?"#a89cf7":"#555"};min-height:14px">${pW>0?pW+"%":""}</span>
-      <div class="bar-inner"><div class="bar-rect" style="height:${h}px;background:${bg};border:${border}"></div></div>
-      <span style="font-size:11px;color:${isT?"#a89cf7":isA?"#888":"#555"};font-weight:${isT?500:400}">${SHORT[d]}</span>
-    </div>`;
-  }).join("");
-
-  const activeDays=DAYS.filter(d=>(SCHEDULE[d]||[]).some(t=>isChecked(t.id,todayStr()))).length;
-  const dayBoxes=DAYS.map(d=>{
-    const ts=SCHEDULE[d]||[];
-    const dW=ts.filter(t=>isChecked(t.id,todayStr())).length;
-    const pW=ts.length?Math.round((dW/ts.length)*100):0;
-    const isT=d===td;
-    return `<div class="day-box${isT?" today-box":""}" onclick="setActiveDay('${d}');setView('today')">
-      <div style="font-size:10px;color:${isT?"#a89cf7":"#666"};margin-bottom:4px">${SHORT[d]}</div>
-      <div style="font-size:17px;font-weight:500;color:${pW>0?"#7c6ef5":"#444"}">${pW}%</div>
-      <div style="font-size:9px;color:#555;margin-top:2px">${ts.length}t</div>
-    </div>`;
-  }).join("");
-
-  const catBars=Object.entries(CAT_LABEL).map(([c,l])=>{
-    const todayTasks=(SCHEDULE[td]||[]).filter(t=>cat(t.label)===c);
-    if(!todayTasks.length)return"";
-    const dC=todayTasks.filter(t=>isChecked(t.id,todayStr())).length;
-    const pC=Math.round((dC/todayTasks.length)*100);
-    return `<div style="margin-bottom:9px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <div style="display:flex;align-items:center;gap:6px"><div class="dot" style="background:${CAT_COLOR[c]}"></div><span style="font-size:12px;color:#aaa">${l}</span></div>
-        <span style="font-size:12px;color:#666">${dC}/${todayTasks.length}</span>
+  const list = panel.querySelector(`#blocks-${day}`);
+  DATA[day].blocks.forEach((b,idx)=>{
+    const [start,end,title,type] = b;
+    const row = document.createElement('div');
+    row.className = 'block';
+    const key = storageKey(day, idx);
+    const checked = localStorage.getItem(key) === '1';
+    row.innerHTML = `
+      <div class="check ${checked?'checked':''}" data-key="${key}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0D1117" stroke-width="3" stroke-linecap="round"><polyline points="4 12 10 18 20 6"/></svg>
       </div>
-      <div class="bar"><div class="fill" style="width:${pC}%;background:${CAT_COLOR[c]}"></div></div>
-    </div>`;
-  }).join("");
-
-  return `
-    <p style="font-size:13px;color:#666;margin-bottom:1rem">Weekly completion — tap a bar to open that day</p>
-    <div class="card">
-      <div class="bar-chart">${bars}</div>
-      <div class="chart-footer">
-        <span style="font-size:11px;color:#555">${activeDays}/7 days active</span>
-        <div style="display:flex;gap:10px">
-          ${[["#7c6ef5","Today"],["#3d3470","Done"],["#222","Pending"]].map(([bg,lbl])=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#555"><div class="legend-dot" style="background:${bg};border:${bg==="#222"?"0.5px solid #333":"none"}"></div>${lbl}</div>`).join("")}
+      <div class="block-main">
+        <div class="block-top">
+          <div class="block-title ${checked?'done':''}"><span class="pill" style="background:var(--${type})"></span>${title}</div>
+          <div class="block-time">${start} – ${end}</div>
         </div>
       </div>
-    </div>
-    <div class="card">
-      <div class="card-title">Day load overview</div>
-      <div class="day-grid">${dayBoxes}</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Category breakdown — ${SHORT[td]}</div>
-      ${catBars}
-    </div>
-  `;
-}
-
-function renderHistory(){
-  if(historyDate){
-    const dn=getDayFromDate(historyDate);
-    const tasks=SCHEDULE[dn]||[];
-    const done=tasks.filter(t=>isChecked(t.id,historyDate)).length;
-    const pct=tasks.length?Math.round((done/tasks.length)*100):0;
-    const isToday=historyDate===todayStr();
-    return `
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
-        <button class="back-btn" onclick="historyDate=null;render()">← Back</button>
-        <div>
-          <span style="font-size:15px;font-weight:500;color:#f0f0f0">${dn} — ${shortDate(historyDate)}</span>
-          ${isToday?`<span style="font-size:11px;color:#a89cf7;margin-left:8px">Today</span>`:""}
-        </div>
-      </div>
-      <div class="progress-wrap">
-        <div class="progress-top">
-          <span class="progress-label">${DAY_BADGE[dn]}</span>
-          <span class="progress-val">${done?`${done}/${tasks.length} · ${pct}%`:"No data"}</span>
-        </div>
-        <div class="bar"><div class="fill" style="width:${pct}%;background:linear-gradient(90deg,#7c6ef5,#a89cf7)"></div></div>
-      </div>
-      ${!done?`<div style="text-align:center;color:#555;font-size:13px;padding:1rem 0">No tasks completed this day</div>`:""}
-      ${renderTasks(tasks,historyDate,false)}
     `;
-  }
+    const check = row.querySelector('.check');
+    const titleEl = row.querySelector('.block-title');
+    check.onclick = ()=>{
+      const isChecked = check.classList.toggle('checked');
+      titleEl.classList.toggle('done', isChecked);
+      localStorage.setItem(key, isChecked ? '1':'0');
+      updateProgress(day);
+    };
+    list.appendChild(row);
+  });
+});
 
-  const last7=getLast7();
-  const rows=last7.map(date=>{
-    const {done,total,pct}=getCompletion(date);
-    const dn=getDayFromDate(date);
-    const isToday=date===todayStr();
-    return `<div class="history-row${isToday?" today-row":""}" onclick="historyDate='${date}';render()">
-      <div style="min-width:70px">
-        <div style="font-size:12px;font-weight:500;color:${isToday?"#a89cf7":"#ccc"}">${SHORT[dn]}${isToday?" · Today":""}</div>
-        <div style="font-size:11px;color:#555;margin-top:2px">${shortDate(date)}</div>
-      </div>
-      <div style="flex:1"><div class="bar"><div class="fill" style="width:${pct}%;background:${done?"#7c6ef5":"#333"}"></div></div></div>
-      <div style="min-width:60px;text-align:right">
-        <span style="font-size:13px;font-weight:500;color:${done?"#7c6ef5":"#444"}">${done?`${done}/${total}`:"—"}</span>
-        <span style="font-size:11px;color:#555;margin-left:4px">${done?pct+"%":""}</span>
-      </div>
-      <span style="font-size:14px;color:#444">›</span>
-    </div>`;
-  }).join("");
+function fullDayName(d){
+  const map = {Mon:"Monday",Tue:"Tuesday",Wed:"Wednesday",Thu:"Thursday",Fri:"Friday",Sat:"Saturday",Sun:"Sunday"};
+  return map[d];
+}
 
-  const total7=last7.reduce((a,d)=>a+getCompletion(d).done,0);
-  const best=last7.reduce((a,b)=>getCompletion(a).pct>=getCompletion(b).pct?a:b);
-  const bestLabel=getCompletion(best).done>0?SHORT[getDayFromDate(best)]:"—";
-  const avg=Math.round(last7.reduce((a,d)=>a+getCompletion(d).pct,0)/7);
+function switchDay(day){
+  document.querySelectorAll('.daytab').forEach(t=>t.classList.toggle('active', t.dataset.day===day));
+  document.querySelectorAll('.daypanel').forEach(p=>p.classList.toggle('active', p.dataset.day===day));
+}
 
-  const catRows=Object.entries(CAT_LABEL).map(([c,l])=>{
-    let total=0,done=0;
-    last7.forEach(date=>{
-      const dn=getDayFromDate(date);
-      const ts=(SCHEDULE[dn]||[]).filter(t=>cat(t.label)===c);
-      total+=ts.length;
-      done+=ts.filter(t=>isChecked(t.id,date)).length;
-    });
-    if(!total)return"";
-    const p=Math.round((done/total)*100);
-    return `<div style="margin-bottom:9px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <div style="display:flex;align-items:center;gap:6px"><div class="dot" style="background:${CAT_COLOR[c]}"></div><span style="font-size:12px;color:#aaa">${l}</span></div>
-        <span style="font-size:12px;color:#666">${done}/${total} · ${p}%</span>
-      </div>
-      <div class="bar"><div class="fill" style="width:${p}%;background:${CAT_COLOR[c]}"></div></div>
-    </div>`;
-  }).join("");
+function dayPct(day){
+  const total = DATA[day].blocks.length;
+  let done = 0;
+  DATA[day].blocks.forEach((b,idx)=>{
+    if(localStorage.getItem(storageKey(day,idx))==='1') done++;
+  });
+  return Math.round((done/total)*100);
+}
 
-  return `
-    <p style="font-size:13px;color:#666;margin-bottom:1rem">Tap any day to see detailed completion</p>
-    <div class="card">
-      <div class="card-title">Last 7 days</div>
-      ${rows}
-    </div>
-    <div class="card">
-      <div class="card-title">7-day stats</div>
-      <div class="stat-grid">
-        <div class="stat-box"><div class="stat-label">Tasks done</div><div class="stat-val">${total7}</div></div>
-        <div class="stat-box"><div class="stat-label">Best day</div><div class="stat-val">${bestLabel}</div></div>
-        <div class="stat-box"><div class="stat-label">Avg</div><div class="stat-val">${avg>0?avg+"%":"—"}</div></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">Category consistency — last 7 days</div>
-      ${catRows}
-    </div>
+function updateProgress(day){
+  const pct = dayPct(day);
+  const fill = document.getElementById(`fill-${day}`);
+  if(fill) fill.style.width = pct + '%';
+  updateWeekOverview();
+}
+
+// build week overview rows
+const weekRowsEl = document.getElementById('weekRows');
+DAY_ORDER.forEach(day=>{
+  const row = document.createElement('div');
+  row.className = 'week-row' + (day===todayName ? ' is-today':'');
+  row.innerHTML = `
+    <span class="wday">${day}</span>
+    <div class="week-track" data-day="${day}"><div class="week-fill" id="wfill-${day}"></div></div>
+    <span class="wpct" id="wpct-${day}">0%</span>
   `;
+  row.querySelector('.week-track').onclick = ()=> switchDay(day);
+  weekRowsEl.appendChild(row);
+});
+
+function updateWeekOverview(){
+  let sum = 0;
+  DAY_ORDER.forEach(day=>{
+    const pct = dayPct(day);
+    sum += pct;
+    const wfill = document.getElementById(`wfill-${day}`);
+    const wpct = document.getElementById(`wpct-${day}`);
+    if(wfill) wfill.style.width = pct + '%';
+    if(wpct) wpct.textContent = pct + '%';
+  });
+  const avg = Math.round(sum / DAY_ORDER.length);
+  document.getElementById('weekAvg').textContent = `${avg}% avg`;
 }
 
-function setActiveDay(d){activeDay=d;render();}
+DAY_ORDER.forEach(updateProgress);
+updateWeekOverview();
 
-function render(){
-  const main=document.getElementById("main");
-  if(currentView==="today")main.innerHTML=renderToday();
-  else if(currentView==="week")main.innerHTML=renderWeek();
-  else main.innerHTML=renderHistory();
-}
+document.getElementById('resetBtn').onclick = ()=>{
+  const activeDay = document.querySelector('.daypanel.active').dataset.day;
+  DATA[activeDay].blocks.forEach((b,idx)=> localStorage.removeItem(storageKey(activeDay, idx)));
+  document.querySelectorAll(`#blocks-${activeDay} .check`).forEach(c=>{
+    c.classList.remove('checked');
+    c.parentElement.querySelector('.block-title').classList.remove('done');
+  });
+  updateProgress(activeDay);
+};
 
-// init
-loadLogs();
-document.getElementById("date-sub").textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"});
-render();
+const doneToday = DATA[todayName].blocks.filter((b,idx)=> localStorage.getItem(storageKey(todayName,idx))==='1').length;
+document.getElementById('streakinfo').textContent = `${fullDayName(todayName)} — ${doneToday}/${DATA[todayName].blocks.length} blocks done this week`;
 </script>
+
 </body>
 </html>
