@@ -278,6 +278,132 @@
     vertical-align:middle;
   }
 
+  .timelog{
+    margin-top:20px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:20px;
+  }
+  .timelog-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:6px;
+  }
+  .timelog-top h3{
+    font-family:var(--font-display);
+    font-size:15px;
+    font-weight:600;
+  }
+  .timelog-sub{
+    font-size:12.5px;
+    color:var(--muted);
+    margin-bottom:18px;
+  }
+  .tl-daytabs{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    margin-bottom:18px;
+    scrollbar-width:none;
+  }
+  .tl-daytabs::-webkit-scrollbar{display:none;}
+  .tl-daytab{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--muted);
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    padding:7px 13px;
+    border-radius:7px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .tl-daytab.active{
+    color:var(--bg);
+    background:var(--text);
+    border-color:var(--text);
+    font-weight:600;
+  }
+  .tl-input-row{
+    display:grid;
+    grid-template-columns:20px 1fr 70px;
+    align-items:center;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .tl-input-row:last-child{border-bottom:none;}
+  .tl-input-row .pill{margin:0;}
+  .tl-input-row label{font-size:13.5px;}
+  .tl-input-row input{
+    width:70px;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:var(--font-mono);
+    font-size:13px;
+    padding:6px 8px;
+    border-radius:6px;
+    text-align:right;
+  }
+  .tl-input-row input:focus{outline:1px solid var(--dsa); border-color:var(--dsa);}
+  .tl-day-total{
+    text-align:right;
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--muted);
+    margin-top:10px;
+  }
+  .tl-summary{
+    margin-top:22px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+  }
+  .tl-summary h4{
+    font-family:var(--font-display);
+    font-size:13px;
+    font-weight:600;
+    color:var(--muted);
+    margin-bottom:14px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .tl-cat-row{
+    display:grid;
+    grid-template-columns:130px 1fr 50px;
+    align-items:center;
+    gap:12px;
+    padding:6px 0;
+  }
+  .tl-cat-row .catname{
+    font-size:12.5px;
+    display:flex;
+    align-items:center;
+  }
+  .tl-cat-track{
+    height:6px;
+    background:var(--surface-2);
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .tl-cat-fill{height:100%; border-radius:3px; transition:width .3s ease;}
+  .tl-cat-row .cathrs{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--muted);
+    text-align:right;
+  }
+  .tl-week-total{
+    margin-top:16px;
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--text);
+    text-align:right;
+  }
+  .tl-week-total span{color:var(--gate); font-weight:600;}
+
   footer{
     max-width:900px;
     margin:40px auto 0;
@@ -432,9 +558,9 @@ const DATA = {
   ]},
   Sun: { load:"Heavy", blocks:[
     ["06:00 AM","06:30 AM","Wake up + freshen up","revision"],
-    ["06:30 AM","07:30 AM","DSA / GATE problem set (warm-up)","dsa"],
-    ["07:30 AM","08:15 AM","Breakfast + get ready","revision"],
-    ["08:30 AM","10:10 AM","DBMS (PR)","class"],
+    ["06:30 AM","08:00 AM","GATE prep (extended block)","gate"],
+    ["08:00 AM","08:30 AM","Breakfast + get ready","revision"],
+    ["08:30 AM","10:15 AM","DSA practice (extra morning session)","dsa"],
     ["10:15 AM","11:05 AM","Computer Organization & Architecture (PP)","class"],
     ["11:05 AM","11:55 AM","Data Structures (PP)","class"],
     ["12:00 PM","12:50 PM","DBMS (PP)","class"],
